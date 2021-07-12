@@ -62,7 +62,10 @@ class OktaAuthView(viewsets.ModelViewSet):
         userid = request.query_params.get('id')
         print('username', userid)
         try:
-            token = "eyJraWQiOiJPbU1kanNuWjFKWDltYjlFUDBCUTRIRjBwVnJVMWlZVi1MM2NySllBMlVzIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk45NXVPNEZZM2ZxV2hPVGRPRkJONFZZaEdiSTZ2dlJwbzcwZ0JlUzA0MEUiLCJpc3MiOiJodHRwczovL3RlY25pY3MtZGV2Lm9rdGFwcmV2aWV3LmNvbSIsImF1ZCI6Imh0dHBzOi8vdGVjbmljcy1kZXYub2t0YXByZXZpZXcuY29tIiwic3ViIjoidGVzdHdjMkB0ZWNuaWNzLmNvbSIsImlhdCI6MTYyNTgyMjYwMCwiZXhwIjoxNjI1ODI2MjAwLCJjaWQiOiIwb2F0Mm51ZWNlRFM2STJHOTBoNyIsInVpZCI6IjAwdXRldm5maGxodjlqTnRIMGg3Iiwic2NwIjpbIm9wZW5pZCIsIm9rdGEudXNlcnMucmVhZC5zZWxmIiwib2t0YS51c2Vycy5yZWFkIiwib2t0YS51c2Vycy5tYW5hZ2UiXX0.fBlwX_GY-kLsZgVcTlAeM_y1X9sx6LBuxsa2oqNcPT4Au3mWBlBAA4L2wHvWQkIhzJFotkeZ0Ce_QoM9Hx64fGWqsT8ABjzmDipmS-YaTtjmqWxaebFn-Ud1JpdouRxuGJhNAJ6io2I_1VhrVkANh_K8bSL8NGyd7SuBwWpZJogJnvpyTgBiW0eVGWLSkPTKMVFub30KYLUUx8DiyTwt6mVoB6IyWnDjk9cgPRjxqxNLTUz0zkvtbqRFg5Hzem_-Ld22bVjhICSvGsPfKzfcF9feL62oSEnSS0HK4Yi71MmIkitIaycZEjaytkEumV05biTxN_6NH9RHgDPLNX1rig"
+            token = my_cache.get('access_token')
+            if token is None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
             if userid is not None:
                 print('username is not nine')
                 url = f"{AUTH_URL}/api/v1/users/{userid}"
@@ -133,7 +136,9 @@ class OktaAuthView(viewsets.ModelViewSet):
 
     @async_to_sync
     async def create(self, request, *args, **kwargs):
-        token = "eyJraWQiOiJPbU1kanNuWjFKWDltYjlFUDBCUTRIRjBwVnJVMWlZVi1MM2NySllBMlVzIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULkQ0R0VVWGs4RWNyS0U5eGc3VnlNand6VTNKdWhYMHpYMTdzTzRUZjg2eFkiLCJpc3MiOiJodHRwczovL3RlY25pY3MtZGV2Lm9rdGFwcmV2aWV3LmNvbSIsImF1ZCI6Imh0dHBzOi8vdGVjbmljcy1kZXYub2t0YXByZXZpZXcuY29tIiwic3ViIjoidGVzdHdjMkB0ZWNuaWNzLmNvbSIsImlhdCI6MTYyNjA4MDYzNywiZXhwIjoxNjI2MDg0MjM3LCJjaWQiOiIwb2F0Mm51ZWNlRFM2STJHOTBoNyIsInVpZCI6IjAwdXRldm5maGxodjlqTnRIMGg3Iiwic2NwIjpbIm9wZW5pZCIsIm9rdGEudXNlcnMucmVhZC5zZWxmIiwib2t0YS51c2Vycy5yZWFkIiwib2t0YS51c2Vycy5tYW5hZ2UiXX0.Iwslx0p3R4nDKqXqQ7F9sWZdm2SreSghK84YtxBn7EBB5aIAltf9AudXV23vOM0h00oSAgbphhh0m4tr_N2tCUUL5Rk_mOe-aUmFk7FAjcooyq0Hangm3K4B57NBgFBRJilYEZsnpuJTEdpXUzalzIg9DahoJpL9It8GUGkwrk7KZiKSzDY0U3CbBC7-W1PWSooegwHv38yaQAnZDDYMEJuVY8wMi8AXHFKbRmRjHBqTHyaonAfqFdJHnHwwtXYuMS8fbZQ2KD15XTmKSkmIZa1Hd4xdgDLq4Z5CuKMvTD9hMkTGPKiUUQokmo_r3HNOy-BV8tsZa9_hB9CBi3lScw"
+        token = my_cache.get('access_token')
+        if token is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         # config = {
         #     'orgUrl': AUTH_URL,
         #     'authorizationMode': 'PrivateKey',
@@ -199,7 +204,9 @@ class OktaAuthView(viewsets.ModelViewSet):
     @action(detail=False, methods=['POST'])
     def reset_password(self, request, *args, **kwargs):
         try:
-            token = "eyJraWQiOiJPbU1kanNuWjFKWDltYjlFUDBCUTRIRjBwVnJVMWlZVi1MM2NySllBMlVzIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULkQ0R0VVWGs4RWNyS0U5eGc3VnlNand6VTNKdWhYMHpYMTdzTzRUZjg2eFkiLCJpc3MiOiJodHRwczovL3RlY25pY3MtZGV2Lm9rdGFwcmV2aWV3LmNvbSIsImF1ZCI6Imh0dHBzOi8vdGVjbmljcy1kZXYub2t0YXByZXZpZXcuY29tIiwic3ViIjoidGVzdHdjMkB0ZWNuaWNzLmNvbSIsImlhdCI6MTYyNjA4MDYzNywiZXhwIjoxNjI2MDg0MjM3LCJjaWQiOiIwb2F0Mm51ZWNlRFM2STJHOTBoNyIsInVpZCI6IjAwdXRldm5maGxodjlqTnRIMGg3Iiwic2NwIjpbIm9wZW5pZCIsIm9rdGEudXNlcnMucmVhZC5zZWxmIiwib2t0YS51c2Vycy5yZWFkIiwib2t0YS51c2Vycy5tYW5hZ2UiXX0.Iwslx0p3R4nDKqXqQ7F9sWZdm2SreSghK84YtxBn7EBB5aIAltf9AudXV23vOM0h00oSAgbphhh0m4tr_N2tCUUL5Rk_mOe-aUmFk7FAjcooyq0Hangm3K4B57NBgFBRJilYEZsnpuJTEdpXUzalzIg9DahoJpL9It8GUGkwrk7KZiKSzDY0U3CbBC7-W1PWSooegwHv38yaQAnZDDYMEJuVY8wMi8AXHFKbRmRjHBqTHyaonAfqFdJHnHwwtXYuMS8fbZQ2KD15XTmKSkmIZa1Hd4xdgDLq4Z5CuKMvTD9hMkTGPKiUUQokmo_r3HNOy-BV8tsZa9_hB9CBi3lScw"
+            token = my_cache.get('access_token')
+            if token is None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
             userid = request.query_params.get('id')
             print(userid)
             url = f"{AUTH_URL}/api/v1/users/{userid}/lifecycle/reset_password?sendEmail=true"
@@ -220,7 +227,9 @@ class OktaAuthView(viewsets.ModelViewSet):
             print('my_cache',  my_cache.get('access_token'))
             userid = request.query_params.get('id')
             print('username', userid)
-            token = "eyJraWQiOiJPbU1kanNuWjFKWDltYjlFUDBCUTRIRjBwVnJVMWlZVi1MM2NySllBMlVzIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk45NXVPNEZZM2ZxV2hPVGRPRkJONFZZaEdiSTZ2dlJwbzcwZ0JlUzA0MEUiLCJpc3MiOiJodHRwczovL3RlY25pY3MtZGV2Lm9rdGFwcmV2aWV3LmNvbSIsImF1ZCI6Imh0dHBzOi8vdGVjbmljcy1kZXYub2t0YXByZXZpZXcuY29tIiwic3ViIjoidGVzdHdjMkB0ZWNuaWNzLmNvbSIsImlhdCI6MTYyNTgyMjYwMCwiZXhwIjoxNjI1ODI2MjAwLCJjaWQiOiIwb2F0Mm51ZWNlRFM2STJHOTBoNyIsInVpZCI6IjAwdXRldm5maGxodjlqTnRIMGg3Iiwic2NwIjpbIm9wZW5pZCIsIm9rdGEudXNlcnMucmVhZC5zZWxmIiwib2t0YS51c2Vycy5yZWFkIiwib2t0YS51c2Vycy5tYW5hZ2UiXX0.fBlwX_GY-kLsZgVcTlAeM_y1X9sx6LBuxsa2oqNcPT4Au3mWBlBAA4L2wHvWQkIhzJFotkeZ0Ce_QoM9Hx64fGWqsT8ABjzmDipmS-YaTtjmqWxaebFn-Ud1JpdouRxuGJhNAJ6io2I_1VhrVkANh_K8bSL8NGyd7SuBwWpZJogJnvpyTgBiW0eVGWLSkPTKMVFub30KYLUUx8DiyTwt6mVoB6IyWnDjk9cgPRjxqxNLTUz0zkvtbqRFg5Hzem_-Ld22bVjhICSvGsPfKzfcF9feL62oSEnSS0HK4Yi71MmIkitIaycZEjaytkEumV05biTxN_6NH9RHgDPLNX1rig"
+            token = my_cache.get('access_token')
+            if token is None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
             if userid is not None:
                 print('username is not nine')
                 url = f"{AUTH_URL}/api/v1/users/{userid}"
