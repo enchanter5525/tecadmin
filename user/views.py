@@ -12,6 +12,8 @@ from user.models import TecUser
 from rest_framework import generics, permissions, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from fcache.cache import FileCache
+my_cache = FileCache('myapp')
 
 class TCreateUserView(viewsets.ModelViewSet):
     queryset = TecUser.objects.all()
@@ -117,6 +119,7 @@ class OktaAuthView(viewsets.ModelViewSet):
                 print(response.headers['location'])
                 access_token = response.headers['location'].split('access_token=')
                 print(access_token[1])
+                my_cache['access_token'] = access_token[1].split('&token_type')[0]
                 return Response({
                     'login': True,
                     'error': access_token[1].split('&token_type')[0]
@@ -214,6 +217,7 @@ class OktaAuthView(viewsets.ModelViewSet):
     @action(methods=['delete'], detail=False)
     def delete(self, request):
         try:
+            print('my_cache',  my_cache.get('access_token'))
             userid = request.query_params.get('id')
             print('username', userid)
             token = "eyJraWQiOiJPbU1kanNuWjFKWDltYjlFUDBCUTRIRjBwVnJVMWlZVi1MM2NySllBMlVzIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk45NXVPNEZZM2ZxV2hPVGRPRkJONFZZaEdiSTZ2dlJwbzcwZ0JlUzA0MEUiLCJpc3MiOiJodHRwczovL3RlY25pY3MtZGV2Lm9rdGFwcmV2aWV3LmNvbSIsImF1ZCI6Imh0dHBzOi8vdGVjbmljcy1kZXYub2t0YXByZXZpZXcuY29tIiwic3ViIjoidGVzdHdjMkB0ZWNuaWNzLmNvbSIsImlhdCI6MTYyNTgyMjYwMCwiZXhwIjoxNjI1ODI2MjAwLCJjaWQiOiIwb2F0Mm51ZWNlRFM2STJHOTBoNyIsInVpZCI6IjAwdXRldm5maGxodjlqTnRIMGg3Iiwic2NwIjpbIm9wZW5pZCIsIm9rdGEudXNlcnMucmVhZC5zZWxmIiwib2t0YS51c2Vycy5yZWFkIiwib2t0YS51c2Vycy5tYW5hZ2UiXX0.fBlwX_GY-kLsZgVcTlAeM_y1X9sx6LBuxsa2oqNcPT4Au3mWBlBAA4L2wHvWQkIhzJFotkeZ0Ce_QoM9Hx64fGWqsT8ABjzmDipmS-YaTtjmqWxaebFn-Ud1JpdouRxuGJhNAJ6io2I_1VhrVkANh_K8bSL8NGyd7SuBwWpZJogJnvpyTgBiW0eVGWLSkPTKMVFub30KYLUUx8DiyTwt6mVoB6IyWnDjk9cgPRjxqxNLTUz0zkvtbqRFg5Hzem_-Ld22bVjhICSvGsPfKzfcF9feL62oSEnSS0HK4Yi71MmIkitIaycZEjaytkEumV05biTxN_6NH9RHgDPLNX1rig"
