@@ -1,14 +1,15 @@
+from django.utils import timezone
 import requests
 from asgiref.sync import sync_to_async, async_to_sync
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django.core import serializers
 from django.forms import model_to_dict
 from rest_framework.views import APIView
 from rest_framework import status
 import asyncio
 from TecAdminWebConsole.settings import AUTH_URL
-from user.serializers import TUserSerializer
-from user.models import TecUser
+from user.serializers import AppConfigSerializer, LogsSerializer, TUserSerializer
+from user.models import AppConfiguration, Logs, TecUser
 from rest_framework import generics, permissions, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -55,6 +56,27 @@ class TCreateUserView(viewsets.ModelViewSet):
     #
     # def destroy(self, request, pk=None):
     #     pass
+class ApplicationLogsView(viewsets.ModelViewSet):
+    queryset = Logs.objects.all()
+    serializer_class = LogsSerializer
+    
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+class AppConfigurationView(viewsets.ReadOnlyModelViewSet):
+    queryset = AppConfiguration.objects.all()
+    serializer_class = AppConfigSerializer
+
+
 
 class OktaAuthView(viewsets.ModelViewSet):
 
@@ -118,15 +140,25 @@ class OktaAuthView(viewsets.ModelViewSet):
                 url = AUTH_URL + '/oauth2/v1/authorize'
                 print(url)
                 response = requests.get(url, params=params, allow_redirects=False)
-                print(response.text)
-                print(response.headers['location'])
-                access_token = response.headers['location'].split('access_token=')
-                print(access_token[1])
-                my_cache['access_token'] = access_token[1].split('&token_type')[0]
-                return Response({
-                    'login': True,
-                    'error': access_token[1].split('&token_type')[0]
-                })
+                if response.status_code == 302:
+                    user_instance = TecUser.objects.get(userid=request.data['userid'])
+                    logs = Logs(userid=user_instance, timestamp=timezone.now(), activity='login', ip_address=get_client_ip(request))
+                    logs.save()
+                    print(response.text)
+                    print(response.headers['location'])
+                    access_token = response.headers['location'].split('access_token=')
+                    print(access_token[1])
+                    my_cache['access_token'] = access_token[1].split('&token_type')[0]
+                    return Response({
+                        'login': True,
+                        'error': None
+                    })
+                else:
+                     return Response({
+                        'login': False,
+                        'error': None
+                    })
+
         except Exception as e:
             print('Common Exceprion', e)
             return Response({
@@ -134,8 +166,8 @@ class OktaAuthView(viewsets.ModelViewSet):
                 'error': 'Login Failed'
             })
 
-    @async_to_sync
-    async def create(self, request, *args, **kwargs):
+    # @async_to_sync
+    def create(self, request, *args, **kwargs):
         token = my_cache.get('access_token')
         if token is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -188,6 +220,13 @@ class OktaAuthView(viewsets.ModelViewSet):
                     'error': json_response['errorSummary']
                 })
             else:
+                new_user = TecUser(firstname= request.data['firstname'],
+                lastname= request.data['lastname'],
+                email=request.data['email'],
+                userid=request.data['email'],
+                phone=request.data['phone'],
+                password=make_password(request.data['password']))
+                new_user.save()
                 return Response({
                     'created': True,
                     'uid': json_response['id'],
@@ -247,3 +286,4 @@ class OktaAuthView(viewsets.ModelViewSet):
         except Exception as e:
             print('Unkown error', e)
             return Response({'error': 'Cannot delete the user'})
+

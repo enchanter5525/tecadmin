@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
+from user.models import AppConfiguration
 from TecAdminWebConsole.settings import AUTHENTICATION_TO_BE_USED
 from user import views
 
@@ -12,6 +12,8 @@ else:
     router.register(r'users', views.OktaAuthView, basename='okta')
     # router.register(r'^users/(?P<username>.+)/$', views.OktaAuthView, basename='okta')
 
+router.register(r'config', views.AppConfigurationView)
 urlpatterns = [
     path('', include(router.urls)),
 ]
+    
