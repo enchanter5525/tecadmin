@@ -62,6 +62,7 @@ class ApplicationLogsView(viewsets.ModelViewSet):
     
 
     def create(self, request, *args, **kwargs):
+        print('In the final of create in Logs', args)
         return super().create(request, *args, **kwargs)
 
 def get_client_ip(request):
@@ -141,9 +142,9 @@ class OktaAuthView(viewsets.ModelViewSet):
                 print(url)
                 response = requests.get(url, params=params, allow_redirects=False)
                 if response.status_code == 302:
-                    user_instance = TecUser.objects.get(userid=request.data['userid'])
-                    logs = Logs(userid=user_instance, timestamp=timezone.now(), activity='login', ip_address=get_client_ip(request))
-                    logs.save()
+                    # user_instance = TecUser.objects.get(userid=request.data['userid'])
+                    # logs = Logs(userid=user_instance, timestamp=timezone.now(), activity='login', ip_address=get_client_ip(request))
+                    # logs.save()
                     print(response.text)
                     print(response.headers['location'])
                     access_token = response.headers['location'].split('access_token=')

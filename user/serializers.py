@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.db.models import fields
-from user import models
+from user import models, views
 
 from user.models import AppConfiguration, Logs, TecUser
 from rest_framework import serializers
@@ -26,9 +26,12 @@ class AppConfigSerializer(serializers.ModelSerializer):
 
 class LogsSerializer(serializers.ModelSerializer):
 
-    class Mets:
+    class Meta:
         model = Logs
-        fields = ('userid', 'timestamp', 'activity', 'ip_address', 'device_env')
+        fields = ('userid', 'timestamp', 'activity')
 
     def create(self, validated_data):
-        return Logs.objects.create(validated_data)
+        print('In the final of create in Logs', validated_data)
+        validated_data['ip_address'] = views.get_client_ip(self._context['request'])
+        validated_data['device_env'] = 'Nothiung';
+        return Logs.objects.create(**validated_data)

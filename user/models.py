@@ -20,8 +20,9 @@ class TecUser(models.Model):
 
 class Logs(models.Model):
     uid = models.UUIDField(unique=True, primary_key=True, default=uuid.uuid4)
-    userid = models.ForeignKey(TecUser, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(max_length=20)
+    # userid = models.ForeignKey(TecUser, on_delete=models.CASCADE)
+    userid = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
     activity = models.CharField(max_length=50)
     ip_address = models.GenericIPAddressField()
     device_env = models.CharField(max_length=150)

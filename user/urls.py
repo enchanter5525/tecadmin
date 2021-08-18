@@ -13,6 +13,8 @@ else:
     # router.register(r'^users/(?P<username>.+)/$', views.OktaAuthView, basename='okta')
 
 router.register(r'config', views.AppConfigurationView)
+router.register(r'logs', views.ApplicationLogsView)
+
 urlpatterns = [
     path('', include(router.urls)),
 ]
