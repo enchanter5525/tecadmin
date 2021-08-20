@@ -22,7 +22,7 @@ class AppConfigSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppConfiguration
-        fields = ('title', 'configuration')
+        fields = ('url', 'configuration')
 
 class LogsSerializer(serializers.ModelSerializer):
 

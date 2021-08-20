@@ -19,7 +19,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api-auth/", include("rest_framework.urls")), # This is for login screen in the api page
-    path('api/user/', include('user.urls')),
+    path('api/v1/', include('user.urls')),
     path('api/apps/', include('apps.urls')),
 
 ]

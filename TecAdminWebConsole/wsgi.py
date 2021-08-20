@@ -15,5 +15,5 @@ from user.prescripts import insertAppConfiguration
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'TecAdminWebConsole.settings')
 
 
-insertAppConfiguration()
+# insertAppConfiguration()
 application = get_wsgi_application()

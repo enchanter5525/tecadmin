@@ -28,5 +28,5 @@ class Logs(models.Model):
     device_env = models.CharField(max_length=150)
 
 class AppConfiguration(models.Model):
-    title = models.CharField(unique=True, max_length=100)
+    url = models.CharField(unique=True, max_length=100)
     configuration = models.JSONField()

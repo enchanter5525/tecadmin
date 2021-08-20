@@ -6,10 +6,12 @@ from user import views
 
 app_name = 'user'
 router = DefaultRouter()
-if AUTHENTICATION_TO_BE_USED == 'local':
-    router.register(r'users', views.TCreateUserView)
-else:
-    router.register(r'users', views.OktaAuthView, basename='okta')
+# if AUTHENTICATION_TO_BE_USED == 'local':
+#     router.register(r'users', views.TCreateUserView)
+# else:
+router.register(r'authn/factors', views.OktaFactorView, basename='okta-factor')
+router.register(r'authn', views.OktaAuthView, basename='okta')
+
     # router.register(r'^users/(?P<username>.+)/$', views.OktaAuthView, basename='okta')
 
 router.register(r'config', views.AppConfigurationView)
